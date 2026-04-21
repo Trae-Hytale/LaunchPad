@@ -22,23 +22,22 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import io.github.trae.di.annotations.type.component.Component;
 import io.github.trae.hytale.framework.packet.InboundPacketWatcher;
-import io.github.trae.utilities.UtilTime;
 import lombok.AllArgsConstructor;
 import me.trae.launchpad.configs.Config;
 import me.trae.launchpad.configs.ParticleConfig;
 import me.trae.launchpad.configs.SoundConfig;
+import me.trae.launchpad.cooldown.CooldownManager;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @AllArgsConstructor
 @Component
 public class LaunchPadInteractPacket implements PlayerPacketWatcher, InboundPacketWatcher {
 
-    private final ConcurrentHashMap<UUID, Long> cooldownMap = new ConcurrentHashMap<>();
+    private final CooldownManager cooldownManager;
 
     private final Config config;
     private final ParticleConfig particleConfig;
@@ -125,9 +124,11 @@ public class LaunchPadInteractPacket implements PlayerPacketWatcher, InboundPack
             }
 
             if (this.config.getCooldownDuration() > 0L) {
-                if (this.hasCooldown(playerRef)) {
+                if (this.cooldownManager.hasCooldown(playerRef)) {
                     return;
                 }
+
+                this.cooldownManager.addCooldown(playerRef);
             }
 
             final Vector3d targetBlockCenter = new Vector3d(targetBlock.getX() + 0.5D, targetBlock.getY() + 1.0D, targetBlock.getZ() + 0.5D);
@@ -212,20 +213,5 @@ public class LaunchPadInteractPacket implements PlayerPacketWatcher, InboundPack
         }
 
         return world.getBlock(block) == BlockType.getAssetMap().getIndex(launchPadBlockType.getId());
-    }
-
-    private boolean hasCooldown(final PlayerRef playerRef) {
-        final Long systemTime = this.cooldownMap.get(playerRef.getUuid());
-        if (systemTime != null) {
-            if (!(UtilTime.elapsed(systemTime, this.config.getCooldownDuration()))) {
-                return true;
-            }
-
-            this.cooldownMap.remove(playerRef.getUuid());
-        } else {
-            this.cooldownMap.put(playerRef.getUuid(), System.currentTimeMillis());
-        }
-
-        return false;
     }
 }
