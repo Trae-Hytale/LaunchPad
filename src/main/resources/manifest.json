@@ -1,0 +1,13 @@
+{
+  "Group": "Trae",
+  "Name": "LaunchPad",
+  "Version": "0.0.1",
+  "Description": "Configurable launch pad blocks that blast players into the sky on right-click. Supports custom velocity, particles, and sounds.",
+  "Main": "me.trae.launchpad.LaunchPadPlugin",
+  "ServerVersion": "*",
+  "Authors": [
+    {
+      "Name": "Trae"
+    }
+  ]
+}
