@@ -51,7 +51,7 @@
     </dependencies>
 
     <build>
-        <finalName>LaunchPad</finalName>
+        <finalName>LaunchPad-${project.version}</finalName>
 
         <plugins>
             <plugin>
